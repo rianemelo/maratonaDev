@@ -1,1 +1,3 @@
-br\com\maratona\dev\MaratonaDevInscricao.class
+br\com\maratona\dev\resource\InscricaoMaratonaResource.class
+br\com\maratona\dev\resource\Pessoa.class
+br\com\maratona\dev\InscricaoMaratonaView.class

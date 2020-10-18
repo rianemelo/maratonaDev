@@ -9,4 +9,19 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  
+  <!-- configuracao do jersey.    -->
+	<servlet>
+		<servlet-name>Jersey Web Application</servlet-name>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+			<init-param>
+        		<param-name>com.sun.jersey.config.property.packages</param-name>
+        		<param-value>br.com.maratona.dev.resource</param-value>
+        	</init-param>
+			<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+	<servlet-name>Jersey Web Application</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
 </web-app>
