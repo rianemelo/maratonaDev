@@ -1,7 +1,13 @@
 package br.com.maratona.dev.resource;
-//REST: nessa classe estão os nossos endpoints.
-//precisamos da dependencia do jersey (REST).
-//e precisamos configurar o jersey no WEB-INF (file: web.xml).
+
+import javax.inject.Inject;
+
+// **1 CDI. Precisamos de duas novas dependências:
+//weld-servlet-core: CDI
+//resteasy-cdi: nosso projeto contem cdi e rest. Essa dep comunica ao rest que o se está usando cdi e vice versa. 
+//Precisamos de dois files de configuração, pq estamos usando o TOMCAT:
+// META-INF_ context.xml: diz para o TOMCAT criar os nossos objetos.
+// WEB-INF_ beans.xml: 
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -16,27 +22,27 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 
-
 @Path(value = "/inscricao")
 public class InscricaoMaratonaResource {
 	
-	InscricaoHelper helper = new InscricaoHelper();
+	@Inject //**1 
+	InscricaoHelper helper;
 	
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON) // aqui nos serve a dependência genson, por causa do json.
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/listar/inscritos")
 	public Response matricula() {
 		helper.init();
-		return Response.status(Status.OK).entity(helper.pessoas).build();
+		return Response.status(Status.OK).entity(helper.getPessoas()).build();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/buscar/inscrito/{id}")
 	public Response buscarPorId(@PathParam("id") String id) {
-		helper.init();
-		Pessoa pessoaBusca = helper.findById(helper.pessoas, id);
+		System.out.println(helper);
+		Pessoa pessoaBusca = helper.findPessoa(new Integer(id));
 		if ( !pessoaBusca.equals(null) ) {
 			return Response.status(Status.OK).entity(pessoaBusca).build();
 		}
@@ -48,9 +54,8 @@ public class InscricaoMaratonaResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/cadastrar/inscrito/")
 	public Response cadastrar(Pessoa pessoa) {
-		helper.init();
-		pessoa.setMatricula(helper.pessoas.size() + 1);
-		helper.pessoas.add(pessoa);
+		pessoa.setMatricula(helper.getPessoas().size() + 1);
+		helper.getPessoas().add(pessoa);
 		return Response.status(Status.CREATED).entity("Inscrito com sucesso!").build();
 	}
 	
@@ -58,8 +63,7 @@ public class InscricaoMaratonaResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/remover/inscrito/{id}")
 	public Response removerPorId(@PathParam("id") String id) {
-		helper.init();
-		Pessoa pessoaRemove = helper.findById(helper.pessoas, id);
+		Pessoa pessoaRemove = helper.findPessoa(new Integer(id));
 		
 		if ( !pessoaRemove.equals(null) ) {
 			helper.pessoas.remove((int)pessoaRemove.getMatricula());
@@ -74,14 +78,12 @@ public class InscricaoMaratonaResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/alterar/inscrito/")
 	public Response alterar(Pessoa pessoa) {
-		helper.init();
-		Pessoa pessoaEdit = helper.findById(helper.pessoas, pessoa.getMatricula().toString());
+		Pessoa pessoaEdit = helper.findPessoa(pessoa.getMatricula());
 		if ( !pessoaEdit.equals(null) ) {
 			pessoaEdit.setNome(pessoa.getNome()); 
 			return Response.status(Status.OK).entity("Alterado com sucesso!").build();
 		}
 		return Response.status(Status.NO_CONTENT).build();
 	}
-
 
 }
