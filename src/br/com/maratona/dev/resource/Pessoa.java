@@ -10,7 +10,6 @@ public class Pessoa {
 	}
 	
 	public Pessoa(String nome, Integer matricula) {
-		super();
 		this.nome = nome;
 		this.matricula = matricula;
 	}
